@@ -15,12 +15,19 @@ import Booking from './components/Booking'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
+import Reviews from './components/Reviews'
+import ParentReviews from './components/ParentReviews'
+import BookingStatus from './components/BookingStatus'
+import BookingsCalendar from './components/BookingsCalendar'
+import SafetyInformation from './components/SafetyInformation'
+import Blog from './components/Blog'
 import { sendBookingEmail } from './services/emailService'
 import { saveBookingToFirebase } from './services/firebaseService'
 
 function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
+  const [isReviewOpen, setIsReviewOpen] = useState(false)
   const [bookings, setBookings] = useState<any[]>([
     {
       id: 1,
@@ -39,8 +46,16 @@ function App() {
       medication: 'None',
       specialRequirements: 'None',
       additionalNotes: 'Sample booking',
-      status: 'pending',
+      status: 'confirmed',
       createdAt: new Date().toISOString(),
+    },
+  ])
+  const [reviews, setReviews] = useState<any[]>([
+    {
+      parentName: 'Sarah M.',
+      rating: 5,
+      text: 'Jana is absolutely amazing with our children. They look forward to her visits every week!',
+      date: 'July 20, 2024',
     },
   ])
 
@@ -51,18 +66,16 @@ function App() {
       status: 'pending',
       createdAt: new Date().toISOString(),
     }
-    
+
     setBookings([booking, ...bookings])
-    
-    // Send email notification
+
     try {
       await sendBookingEmail(booking)
       console.log('✅ Booking email sent successfully')
     } catch (error) {
       console.error('❌ Error sending email:', error)
     }
-    
-    // Save to Firebase
+
     try {
       await saveBookingToFirebase(booking)
       console.log('✅ Booking saved to Firebase')
@@ -71,12 +84,16 @@ function App() {
     }
   }
 
+  const handleAddReview = (review: any) => {
+    setReviews([review, ...reviews])
+  }
+
   const handleUpdateBookingStatus = (id: number, status: string) => {
-    setBookings(bookings.map(b => b.id === id ? { ...b, status } : b))
+    setBookings(bookings.map((b) => (b.id === id ? { ...b, status } : b)))
   }
 
   const handleDeleteBooking = (id: number) => {
-    setBookings(bookings.filter(b => b.id !== id))
+    setBookings(bookings.filter((b) => b.id !== id))
   }
 
   if (isAdminLoggedIn) {
@@ -100,13 +117,15 @@ function App() {
         <Services />
         <Pricing />
         <Gallery />
+        <BookingStatus bookings={bookings} />
+        <BookingsCalendar bookings={bookings} />
+        <SafetyInformation />
         <Testimonials />
+        <ParentReviews reviews={reviews} onAddReview={() => setIsReviewOpen(true)} />
+        <Blog />
         <FAQ />
-        <Booking
-          isOpen={isBookingOpen}
-          onClose={() => setIsBookingOpen(false)}
-          onSubmit={handleAddBooking}
-        />
+        <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} onSubmit={handleAddBooking} />
+        <Reviews isOpen={isReviewOpen} onClose={() => setIsReviewOpen(false)} onSubmit={handleAddReview} />
         <Contact />
       </main>
       <Footer />
