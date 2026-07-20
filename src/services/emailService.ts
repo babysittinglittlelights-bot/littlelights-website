@@ -1,18 +1,23 @@
 import emailjs from '@emailjs/browser'
 
-// Initialize EmailJS (replace with your service ID)
-const SERVICE_ID = 'service_littlelights' // Get from EmailJS dashboard
-const TEMPLATE_ID = 'template_booking' // Get from EmailJS dashboard
-const PUBLIC_KEY = 'your_public_key_here' // Get from EmailJS dashboard
+// Get credentials from environment variables
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_littlelights'
+const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_booking'
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'your_public_key_here'
 
-// Initialize if keys are provided
+// Initialize EmailJS if keys are provided
 if (PUBLIC_KEY !== 'your_public_key_here') {
-  emailjs.init(PUBLIC_KEY)
+  try {
+    emailjs.init(PUBLIC_KEY)
+    console.log('✅ EmailJS initialized')
+  } catch (error) {
+    console.error('❌ EmailJS initialization error:', error)
+  }
 }
 
 export const sendBookingEmail = async (booking: any) => {
   if (PUBLIC_KEY === 'your_public_key_here') {
-    console.warn('EmailJS not configured. Please add your EmailJS credentials.')
+    console.warn('⚠️ EmailJS not configured. Add credentials to .env.local')
     return
   }
 
@@ -30,10 +35,10 @@ export const sendBookingEmail = async (booking: any) => {
       end_time: booking.endTime,
       address: booking.address,
       emergency_contact: booking.emergencyContact,
-      allergies: booking.allergies,
-      medication: booking.medication,
-      special_requirements: booking.specialRequirements,
-      additional_notes: booking.additionalNotes,
+      allergies: booking.allergies || 'None',
+      medication: booking.medication || 'None',
+      special_requirements: booking.specialRequirements || 'None',
+      additional_notes: booking.additionalNotes || 'None',
     }
 
     const response = await emailjs.send(
@@ -42,10 +47,10 @@ export const sendBookingEmail = async (booking: any) => {
       templateParams
     )
 
-    console.log('Email sent successfully:', response)
+    console.log('✅ Booking email sent:', response.status)
     return response
   } catch (error) {
-    console.error('Error sending email:', error)
+    console.error('❌ Error sending booking email:', error)
     throw error
   }
 }
@@ -53,7 +58,7 @@ export const sendBookingEmail = async (booking: any) => {
 // Send confirmation email to parent
 export const sendConfirmationEmail = async (booking: any) => {
   if (PUBLIC_KEY === 'your_public_key_here') {
-    console.warn('EmailJS not configured')
+    console.warn('⚠️ EmailJS not configured')
     return
   }
 
@@ -72,10 +77,10 @@ export const sendConfirmationEmail = async (booking: any) => {
       templateParams
     )
 
-    console.log('Confirmation email sent:', response)
+    console.log('✅ Confirmation email sent:', response.status)
     return response
   } catch (error) {
-    console.error('Error sending confirmation email:', error)
+    console.error('❌ Error sending confirmation email:', error)
     throw error
   }
 }

@@ -57,17 +57,17 @@ function App() {
     // Send email notification
     try {
       await sendBookingEmail(booking)
-      console.log('Booking email sent successfully')
+      console.log('✅ Booking email sent successfully')
     } catch (error) {
-      console.error('Error sending email:', error)
+      console.error('❌ Error sending email:', error)
     }
     
     // Save to Firebase
     try {
       await saveBookingToFirebase(booking)
-      console.log('Booking saved to Firebase')
+      console.log('✅ Booking saved to Firebase')
     } catch (error) {
-      console.error('Error saving to Firebase:', error)
+      console.error('❌ Error saving to Firebase:', error)
     }
   }
 

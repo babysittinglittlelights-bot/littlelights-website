@@ -1,25 +1,36 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { HiLockClosed } from 'react-icons/hi'
+import { HiLockClosed, HiArrowRight } from 'react-icons/hi'
 
 interface AdminLoginProps {
-  onLogin: (password: string) => void
+  onLogin: () => void
 }
 
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const correctPassword = 'Jana2024!' // Change this to your desired password
+  const [attempts, setAttempts] = useState(0)
+  
+  // Get password from environment or use default
+  const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'Jana2024!'
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (attempts >= 5) {
+      setError('Too many attempts. Please try again later.')
+      return
+    }
+    
     if (password === correctPassword) {
-      onLogin(password)
+      onLogin()
       setPassword('')
       setError('')
+      setAttempts(0)
     } else {
-      setError('Incorrect password')
+      setError('❌ Incorrect password')
       setPassword('')
+      setAttempts(attempts + 1)
     }
   }
 
@@ -34,7 +45,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">✨</div>
           <h1 className="text-4xl font-cormorant font-bold text-champagne-gold mb-2">Little Lights</h1>
-          <p className="font-poppins text-gray-600">Admin Login</p>
+          <p className="font-poppins text-gray-600">Admin Dashboard</p>
         </div>
 
         {/* Form */}
@@ -51,25 +62,30 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                   setError('')
                 }}
                 placeholder="Enter admin password"
-                className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-champagne-gold/20 focus:border-champagne-gold focus:outline-none transition-colors"
+                disabled={attempts >= 5}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-champagne-gold/20 focus:border-champagne-gold focus:outline-none transition-colors disabled:bg-gray-100"
               />
             </div>
             {error && <p className="text-red-500 text-sm font-poppins mt-2">{error}</p>}
+            {attempts > 0 && attempts < 5 && (
+              <p className="text-yellow-600 text-sm font-poppins mt-2">Attempt {attempts}/5</p>
+            )}
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: attempts >= 5 ? 1 : 1.02 }}
+            whileTap={{ scale: attempts >= 5 ? 1 : 0.98 }}
             type="submit"
-            className="w-full btn-primary py-3 font-medium"
+            disabled={attempts >= 5}
+            className="w-full btn-primary py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login to Dashboard
+            Login to Dashboard <HiArrowRight size={18} />
           </motion.button>
         </form>
 
         {/* Info */}
         <p className="text-center text-sm text-gray-600 font-poppins mt-6">
-          Only authorized administrators can access this area.
+          🔐 Only authorized administrators can access this area.
         </p>
       </motion.div>
     </div>
