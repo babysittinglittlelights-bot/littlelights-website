@@ -15,6 +15,8 @@ import Booking from './components/Booking'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
+import { sendBookingEmail } from './services/emailService'
+import { saveBookingToFirebase } from './services/firebaseService'
 
 function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
@@ -42,14 +44,31 @@ function App() {
     },
   ])
 
-  const handleAddBooking = (newBooking: any) => {
+  const handleAddBooking = async (newBooking: any) => {
     const booking = {
       id: bookings.length + 1,
       ...newBooking,
       status: 'pending',
       createdAt: new Date().toISOString(),
     }
+    
     setBookings([booking, ...bookings])
+    
+    // Send email notification
+    try {
+      await sendBookingEmail(booking)
+      console.log('Booking email sent successfully')
+    } catch (error) {
+      console.error('Error sending email:', error)
+    }
+    
+    // Save to Firebase
+    try {
+      await saveBookingToFirebase(booking)
+      console.log('Booking saved to Firebase')
+    } catch (error) {
+      console.error('Error saving to Firebase:', error)
+    }
   }
 
   const handleUpdateBookingStatus = (id: number, status: string) => {
