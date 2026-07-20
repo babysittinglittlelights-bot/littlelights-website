@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
+import AdminDashboard from './components/AdminDashboard'
+import AdminLogin from './components/AdminLogin'
 import Navigation from './components/Navigation'
 import Hero from './components/Hero'
 import Features from './components/Features'
@@ -15,10 +18,62 @@ import WhatsAppButton from './components/WhatsAppButton'
 
 function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
+  const [bookings, setBookings] = useState<any[]>([
+    {
+      id: 1,
+      parentName: 'Sample Booking',
+      phone: '063 774 8128',
+      email: 'example@email.com',
+      childrenNames: 'Child Name',
+      childrenAges: '5, 7',
+      numberOfChildren: '2',
+      date: '2026-07-25',
+      startTime: '18:00',
+      endTime: '22:00',
+      address: 'Delmas, Mpumalanga',
+      emergencyContact: '063 774 8128',
+      allergies: 'None',
+      medication: 'None',
+      specialRequirements: 'None',
+      additionalNotes: 'Sample booking',
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    },
+  ])
+
+  const handleAddBooking = (newBooking: any) => {
+    const booking = {
+      id: bookings.length + 1,
+      ...newBooking,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    }
+    setBookings([booking, ...bookings])
+  }
+
+  const handleUpdateBookingStatus = (id: number, status: string) => {
+    setBookings(bookings.map(b => b.id === id ? { ...b, status } : b))
+  }
+
+  const handleDeleteBooking = (id: number) => {
+    setBookings(bookings.filter(b => b.id !== id))
+  }
+
+  if (isAdminLoggedIn) {
+    return (
+      <AdminDashboard
+        bookings={bookings}
+        onLogout={() => setIsAdminLoggedIn(false)}
+        onUpdateStatus={handleUpdateBookingStatus}
+        onDeleteBooking={handleDeleteBooking}
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen bg-ivory">
-      <Navigation onBookClick={() => setIsBookingOpen(true)} />
+      <Navigation onBookClick={() => setIsBookingOpen(true)} onAdminClick={() => setIsAdminLoggedIn(true)} />
       <main>
         <Hero onBookClick={() => setIsBookingOpen(true)} />
         <Features />
@@ -28,7 +83,11 @@ function App() {
         <Gallery />
         <Testimonials />
         <FAQ />
-        <Booking isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
+        <Booking
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          onSubmit={handleAddBooking}
+        />
         <Contact />
       </main>
       <Footer />

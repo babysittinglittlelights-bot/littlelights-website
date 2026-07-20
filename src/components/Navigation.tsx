@@ -4,9 +4,10 @@ import { HiMenu, HiX } from 'react-icons/hi'
 
 interface NavigationProps {
   onBookClick: () => void
+  onAdminClick: () => void
 }
 
-const Navigation = ({ onBookClick }: NavigationProps) => {
+const Navigation = ({ onBookClick, onAdminClick }: NavigationProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const navItems = [
@@ -51,8 +52,16 @@ const Navigation = ({ onBookClick }: NavigationProps) => {
             ))}
           </div>
 
-          {/* CTA Button */}
+          {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onAdminClick}
+              className="px-6 py-2 rounded-full text-sm font-poppins text-champagne-gold border-2 border-champagne-gold hover:bg-champagne-gold/10 transition-all"
+            >
+              Admin
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -100,6 +109,13 @@ const Navigation = ({ onBookClick }: NavigationProps) => {
                 {item.label}
               </motion.a>
             ))}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              onClick={onAdminClick}
+              className="w-full px-4 py-2 text-champagne-gold border-2 border-champagne-gold rounded-lg hover:bg-champagne-gold/10 transition-all font-medium"
+            >
+              Admin Login
+            </motion.button>
           </motion.div>
         )}
       </div>
